@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyRepository : MonoBehaviour
 {
 
-    [SerializeField] EnemyData[] repository;
+    [SerializeField] private EnemyData[] repository;
 
     [System.Serializable]
     public struct EnemyData

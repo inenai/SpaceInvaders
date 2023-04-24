@@ -6,19 +6,19 @@ using UnityEngine;
 public class FlipSprite : MonoBehaviour
 {
 
-    [SerializeField] float frequency;
-    [SerializeField] bool flipX;
-    [SerializeField] bool flipY;
+    [SerializeField] private float frequency;
+    [SerializeField] private bool flipX;
+    [SerializeField] private bool flipY;
 
-    SpriteRenderer sprtRend;
-    float timer;
+    private SpriteRenderer sprtRend;
+    private float timer;
 
     private void Start()
     {
         sprtRend = GetComponent<SpriteRenderer>();
     }
 
-    void Update()
+    private void Update()
     {
         //Flip sprite in X and or Y with set frequency.
         if (timer >= frequency)

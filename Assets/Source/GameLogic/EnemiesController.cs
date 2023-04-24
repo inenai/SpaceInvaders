@@ -6,31 +6,30 @@ public class EnemiesController : MonoBehaviour
 {
 
     [Header("Configiration")]
-    [SerializeField] float minFireTime = 0f;
-    [SerializeField] float maxFireTime = 3f;
-    [SerializeField] int enemyRows = 4;
-    [SerializeField] int enemyColumns = 10;
-    [SerializeField] Vector2 offset = new Vector2(0.35f, 0.3f);
-    [SerializeField] Vector2 originViewport = new Vector2(0.2f, 0.9f);
-    [SerializeField] float resetDelay = 0.6f;
+    [SerializeField] private float minFireTime = 0f;
+    [SerializeField] private float maxFireTime = 3f;
+    [SerializeField] private int enemyRows = 4;
+    [SerializeField] private int enemyColumns = 10;
+    [SerializeField] private Vector2 offset = new Vector2(0.35f, 0.3f);
+    [SerializeField] private Vector2 originViewport = new Vector2(0.2f, 0.9f);
+    [SerializeField] private float resetDelay = 0.6f;
 
     [Header("References")]
-    [SerializeField] GameObject[] enemyPrefabs;
-    [SerializeField] EnemyRepository enemyRepo;
+    [SerializeField] private GameObject[] enemyPrefabs;
+    [SerializeField] private EnemyRepository enemyRepo;
 
-    enum Neighbor { LEFT, RIGHT, UP, DOWN };
+    private Enemy[][] enemies;
+    private HashSet<Enemy> aliveEnemies;
+    private List<Enemy> firingEnemies;
 
-    Enemy[][] enemies;
-    HashSet<Enemy> aliveEnemies;
-    List<Enemy> firingEnemies;
+    private Vector3 vToWorldPoint;
+    private Vector2 initialPosition;
+    private float currentFireDelay;
+    private float fireTimer;
+    private float resetTimer;
+    private bool resetEnemies;
 
-    Vector3 vToWorldPoint;
-    Vector2 initialPosition;
-    float currentFireDelay;
-    float fireTimer;
-    bool resetEnemies;
-
-    void Awake()
+    private void Awake()
     {
         EventDispatcher.OnEnemyKilled += EnemyKilled;
         vToWorldPoint = Camera.main.ViewportToWorldPoint(new Vector3(originViewport.x, originViewport.y, 0f));
@@ -41,7 +40,7 @@ public class EnemiesController : MonoBehaviour
         ResetEnemies();
     }
 
-    void ResetEnemies()
+    private void ResetEnemies()
     {
         EventDispatcher.EnemyReset();
         if (firingEnemies != null)
@@ -79,7 +78,7 @@ public class EnemiesController : MonoBehaviour
         }
     }
 
-    void EnemyKilled(int rowIndex, int columnIndex)
+    private void EnemyKilled(int rowIndex, int columnIndex)
     {
         List<Vector2Int> enemiesToKill = new List<Vector2Int>(); //Adjacent enemies of the same type will be put here to undergo this same process. 
         if ((enemies[rowIndex][columnIndex] != null) && !enemies[rowIndex][columnIndex].HasExploded())
@@ -129,7 +128,7 @@ public class EnemiesController : MonoBehaviour
         }
     }
 
-    void CheckNeighbor(Vector2Int coords, int currentEnemyId, List<Vector2Int> enemiesToKill)
+    private void CheckNeighbor(Vector2Int coords, int currentEnemyId, List<Vector2Int> enemiesToKill)
     {
         Enemy neighbor = enemies[coords.x][coords.y];
         if ((neighbor != null) //Candidate should not be null
@@ -138,14 +137,13 @@ public class EnemiesController : MonoBehaviour
             enemiesToKill.Add(coords);
     }
 
-    void CheckEnemyToKill(Enemy candidate, Enemy dyingEnemy, List<Vector2Int> candidateList)
+    private void CheckEnemyToKill(Enemy candidate, Enemy dyingEnemy, List<Vector2Int> candidateList)
     {
         if ((candidate != null) && (candidate.GetId() == dyingEnemy.GetId()) && !candidate.HasExploded())
             candidateList.Add(new Vector2Int(candidate.rowIndex, candidate.columnIndex));
     }
 
-    float resetTimer;
-    void Update()
+    private void Update()
     {
         if (resetEnemies)
         {

@@ -5,9 +5,9 @@ using UnityEngine;
 public class LinearMove : MonoBehaviour
 {
 
-    [SerializeField] Vector3 speed;
+    [SerializeField] private Vector3 speed;
 
-    void Update()
+    private void Update()
     {
         //Linear move.
         transform.position += speed * Time.deltaTime;

@@ -6,13 +6,13 @@ using UnityEngine;
 public class PlayerMover : MonoBehaviour
 {
 
-    [SerializeField] float speed = 3f;
-    [SerializeField] float edgeOffset = 0.05f;
+    [SerializeField] private float speed = 3f;
+    [SerializeField] private float edgeOffset = 0.05f;
 
-    float minXPos;
-    float maxXPos;
+    private float minXPos;
+    private float maxXPos;
 
-    void Start()
+    private void Start()
     {
         SpriteRenderer sprtRend = GetComponent<SpriteRenderer>();
         minXPos = Camera.main.ViewportToWorldPoint(new Vector3(0f, 0f, 0f)).x;
@@ -24,7 +24,7 @@ public class PlayerMover : MonoBehaviour
         maxXPos -= totalOffset;
     }
 
-    void Update()
+    private void Update()
     {
         float value = Input.GetAxisRaw("Horizontal");
         if (Mathf.Abs(value) > 0.1f)

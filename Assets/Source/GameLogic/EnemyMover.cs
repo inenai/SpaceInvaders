@@ -6,17 +6,15 @@ using UnityEngine;
 public class EnemyMover : MonoBehaviour
 {
 
-    [SerializeField] float horizontalDistance;
-    [SerializeField] float verticalDistance;
-    [SerializeField] float frequency;
-    [SerializeField] float edgeOffset;
+    [SerializeField] private float horizontalDistance;
+    [SerializeField] private float verticalDistance;
+    [SerializeField] private float frequency;
+    [SerializeField] private float edgeOffset;
 
-    SpriteRenderer sprtRend;
-
-    bool goDown;
-    bool goRight;
-
-    float timer;
+    private SpriteRenderer sprtRend;
+    private bool goDown;
+    private bool goRight;
+    private float timer;
 
     private void Awake()
     {
@@ -26,7 +24,7 @@ public class EnemyMover : MonoBehaviour
     }
 
     //If any enemy reached the edge of the screen, next step will be going down, and direction will be the opposite.
-    void OnEnemyReachedEdge(bool goRight)
+    private void OnEnemyReachedEdge(bool goRight)
     {
         goDown = true;
         this.goRight = goRight;

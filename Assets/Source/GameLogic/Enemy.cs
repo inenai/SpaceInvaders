@@ -8,27 +8,27 @@ using UnityEngine;
 [RequireComponent(typeof(EnemyMover))]
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] Transform firePivot;
+    [SerializeField] private Transform firePivot;
 
     [Header("Configuration")]
-    [SerializeField] float idleFrequency = 0.8f;
+    [SerializeField] private float idleFrequency = 0.8f;
 
     [Header("References")]
-    [SerializeField] Sprite[] idleSprites;
-    [SerializeField] Sprite dieSprite;
-    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] private Sprite[] idleSprites;
+    [SerializeField] private Sprite dieSprite;
+    [SerializeField] private GameObject bulletPrefab;
 
     SpriteRenderer sprtRend;
     public int rowIndex { get; private set; }
     public int columnIndex { get; private set; }
-    int enemyId;
-    int score;
-    Color enemyColor;
 
-    int currentLife;
-    int idleSpriteIndex;
-    float timer;
-    bool exploded;
+    private int enemyId;
+    private int score;
+    private Color enemyColor;
+    private int currentLife;
+    private int idleSpriteIndex;
+    private float timer;
+    private bool exploded;
 
     private void Awake()
     {
@@ -59,7 +59,7 @@ public class Enemy : MonoBehaviour
         timer += Time.deltaTime;
     }
 
-    void SwapIdleSprite()
+    private void SwapIdleSprite()
     {
         //Cycle through idle animation sprites.
         idleSpriteIndex++;
@@ -91,8 +91,8 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    Coroutine hitCoroutine = null;
-    IEnumerator Hit()
+    private Coroutine hitCoroutine = null;
+    private IEnumerator Hit()
     {
         sprtRend.color = Color.white;
         yield return new WaitForSeconds(idleFrequency / 2f);
@@ -129,7 +129,7 @@ public class Enemy : MonoBehaviour
         StartCoroutine(DestroyEnemy());
     }
 
-    IEnumerator DestroyEnemy()
+    private IEnumerator DestroyEnemy()
     {
         GetComponent<BoxCollider>().enabled = false;
         yield return new WaitForSeconds(idleFrequency); //So exploding effect will last enough to be properly seen.

@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class LivesCounter : MonoBehaviour
 {
 
-    [SerializeField] GameObject lifeIcon;
+    [SerializeField] private GameObject lifeIcon;
 
-    Image[] lifeIcons;
+    private Image[] lifeIcons;
 
     public void Setup(int lives)
     {

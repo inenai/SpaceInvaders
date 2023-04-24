@@ -8,25 +8,24 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
 
-    [SerializeField] Transform firePivot;
-    [SerializeField] SpriteRenderer sprtRend;
+    [SerializeField] private Transform firePivot;
+    [SerializeField] private SpriteRenderer sprtRend;
 
     [Header("Configuration")]
-    [SerializeField] int initialLife = 3;
-    [SerializeField] float blinkDuration = 0.05f;
+    [SerializeField] private int initialLife = 3;
+    [SerializeField] private float blinkDuration = 0.05f;
 
     [Header("References")]
-    [SerializeField] GameObject bullet;
-    [SerializeField] LivesCounter livesCounter;
-    [SerializeField] SceneLoader sceneLoader;
-    [SerializeField] GameObject explosion;
-    [SerializeField] AudioClip dieSoundEffect;
+    [SerializeField] private GameObject bullet;
+    [SerializeField] private LivesCounter livesCounter;
+    [SerializeField] private SceneLoader sceneLoader;
+    [SerializeField] private GameObject explosion;
+    [SerializeField] private AudioClip dieSoundEffect;
 
-    bool shot;
-    int currentLife;
-    bool onPause;
-
-    Coroutine hitCoroutine = null;
+    private bool shot;
+    private int currentLife;
+    private bool onPause;
+    private Coroutine hitCoroutine = null;
 
     private void Awake()
     {
@@ -39,7 +38,7 @@ public class Player : MonoBehaviour
         livesCounter.Setup(initialLife);
     }
 
-    void Update()
+    private void Update()
     {
         if (Input.GetButton("Fire") && !shot)
         {
@@ -53,7 +52,7 @@ public class Player : MonoBehaviour
             shot = false;
     }
 
-    void ToggleFire(bool onPause)
+    private void ToggleFire(bool onPause)
     {
         this.onPause = onPause;
     }
@@ -80,7 +79,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    IEnumerator EndGame()
+    private IEnumerator EndGame()
     { //Shows enemy exploding before ending game.
         GetComponent<PlayerMover>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;
@@ -92,7 +91,7 @@ public class Player : MonoBehaviour
         sceneLoader.LoadScene(SceneLoader.MAIN_MENU_SCENE);
     }
 
-    IEnumerator Hit() //Blinking invincibility effect on hit.
+    private IEnumerator Hit() //Blinking invincibility effect on hit.
     {
         GetComponent<BoxCollider>().enabled = false;
         for (int i = 0; i < 3; i++)

@@ -7,22 +7,22 @@ using UnityEngine.UI;
 public class ScoreTracker : MonoBehaviour
 {
 
-    Text scoreText;
-    int currentScore;
+    private Text scoreText;
+    private int currentScore;
 
-    void Awake()
+    private void Awake()
     {
         EventDispatcher.OnScoreGained += ScoreGained;
         scoreText = GetComponent<Text>();
     }
 
-    void ScoreGained(int score)
+    private void ScoreGained(int score)
     {
         currentScore += score;
         scoreText.text = currentScore.ToString();
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         EventDispatcher.OnScoreGained -= ScoreGained;
     }

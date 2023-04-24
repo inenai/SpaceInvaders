@@ -6,10 +6,10 @@ using UnityEngine;
 public class PauseMenu : MonoBehaviour
 {
 
-    [SerializeField] GameObject pauseMenu;
+    [SerializeField] private GameObject pauseMenu;
 
-    bool showing;
-    bool pressingMenuBtn;
+    private bool showing;
+    private bool pressingMenuBtn;
 
     public void HideMenu()
     {
@@ -33,7 +33,7 @@ public class PauseMenu : MonoBehaviour
         GetComponent<SceneLoader>().LoadScene(SceneLoader.MAIN_MENU_SCENE);
     }
 
-    void Update()
+    private void Update()
     {
         if (Input.GetButton("Cancel") && !pressingMenuBtn)
         {
@@ -48,7 +48,9 @@ public class PauseMenu : MonoBehaviour
             }
         }
         else if (!Input.GetButton("Cancel")) //Avoid menu from opening and closing each frame while key is pressed.
+        { 
             pressingMenuBtn = false;
+        }
     }
 
 }

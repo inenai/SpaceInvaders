@@ -8,10 +8,11 @@ using UnityEngine;
 public class DestroyWhenOffscreen : MonoBehaviour
 {
 
-    [SerializeField] float offset;
-    float yPosViewport;
+    [SerializeField] private float offset;
 
-    void Update()
+    private float yPosViewport;
+
+    private void Update()
     {
         yPosViewport = Camera.main.WorldToViewportPoint(transform.position).y;
         if (yPosViewport < (0f - offset) || yPosViewport > (1 + offset))

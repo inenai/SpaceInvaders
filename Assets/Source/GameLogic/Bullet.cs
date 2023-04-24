@@ -18,7 +18,7 @@ public class Bullet : MonoBehaviour
         GetComponent<AudioSource>().Play(); //Enemy fire SFX
     }
 
-    void EnemiesReset()
+    private void EnemiesReset()
     {
         Destroy(gameObject); //Bullets disappear when enemies are reset
     }
@@ -33,7 +33,7 @@ public class Bullet : MonoBehaviour
             Destroy(gameObject);
     }
 
-    IEnumerator WaitForSoundToEnd()
+    private IEnumerator WaitForSoundToEnd()
     {
         while (GetComponent<AudioSource>().isPlaying)
         {

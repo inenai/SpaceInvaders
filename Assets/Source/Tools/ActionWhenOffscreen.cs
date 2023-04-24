@@ -9,11 +9,11 @@ using UnityEngine.Events;
 public class ActionWhenOffscreen : MonoBehaviour
 {
 
-    [SerializeField] float offset;
-    [SerializeField] UnityEvent action;
+    [SerializeField] private float offset;
+    [SerializeField] private UnityEvent action;
     float yPosViewport;
 
-    void Update()
+    private void Update()
     {
         yPosViewport = Camera.main.WorldToViewportPoint(transform.position).y;
         if (yPosViewport < (0f - offset) || yPosViewport > (1 + offset))
