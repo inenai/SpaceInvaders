@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemiesController : MonoBehaviour
+namespace Enemies
 {
 
+public class EnemiesController : MonoBehaviour
+{
     [Header("Configiration")]
     [SerializeField] private float minFireTime = 0f;
     [SerializeField] private float maxFireTime = 3f;
@@ -20,13 +22,17 @@ public class EnemiesController : MonoBehaviour
     private Enemy[][] enemies;
     private HashSet<Enemy> aliveEnemies;
     private List<Enemy> firingEnemies;
-
     private Vector3 vToWorldPoint;
     private Vector2 initialPosition;
     private float currentFireDelay;
     private float fireTimer;
     private float resetTimer;
     private bool resetEnemies;
+
+    public EnemyData GetRandomEnemyData()
+    {
+        return enemyRepo.repository[Random.Range(0, enemyRepo.repository.Length)];
+    }
 
     private void Awake()
     {
@@ -75,7 +81,7 @@ public class EnemiesController : MonoBehaviour
                 //Enemies areinstantiated to the right by adding offset. 
                 //Could be instantiated in accordance to viewport so it will look centered in any aspect ratio.
                 enemies[i][j] = enemy.GetComponent<Enemy>();
-                enemies[i][j].Setup(enemyRepo.GetRandomEnemyData(), i, j); //Give random enemy type.
+                enemies[i][j].Setup(GetRandomEnemyData(), i, j); //Give random enemy type.
                 aliveEnemies.Add(enemies[i][j]); //Set with alive enemies. Enemies will be reset when this set is empty.
             }
         }
@@ -114,7 +120,7 @@ public class EnemiesController : MonoBehaviour
                 }
             }
             //Check if any adjacent alive enemies share types with the one being killed:
-            int currentEnemyId = enemies[rowIndex][columnIndex].GetId();
+            int currentEnemyId = enemies[rowIndex][columnIndex].GetKind();
 
             //Check up
             if (rowIndex > 0)
@@ -149,7 +155,7 @@ public class EnemiesController : MonoBehaviour
     {
         Enemy neighbor = enemies[coords.x][coords.y];
         if ((neighbor != null) //Candidate should not be null
-        && (neighbor.GetId() == currentEnemyId) //Should be same type as current enemy
+        && (neighbor.GetKind() == currentEnemyId) //Should be same type as current enemy
         && !(neighbor.HasExploded())) //And should not be marked as killed already.
         { 
             enemiesToKill.Add(coords);
@@ -158,7 +164,7 @@ public class EnemiesController : MonoBehaviour
 
     private void CheckEnemyToKill(Enemy candidate, Enemy dyingEnemy, List<Vector2Int> candidateList)
     {
-        if ((candidate != null) && (candidate.GetId() == dyingEnemy.GetId()) && !candidate.HasExploded())
+        if ((candidate != null) && (candidate.GetKind() == dyingEnemy.GetKind()) && !candidate.HasExploded())
         {
             candidateList.Add(new Vector2Int(candidate.rowIndex, candidate.columnIndex));
         }
@@ -196,4 +202,4 @@ public class EnemiesController : MonoBehaviour
         EventDispatcher.OnEnemyKilled -= EnemyKilled;
     }
 }
-
+}

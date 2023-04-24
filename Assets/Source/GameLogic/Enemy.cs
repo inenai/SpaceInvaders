@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+namespace Enemies
+{
+
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(BoxCollider))]
 [RequireComponent(typeof(AudioSource))]
@@ -17,13 +20,13 @@ public class Enemy : MonoBehaviour
     [SerializeField] private Sprite dieSprite;
     [SerializeField] private GameObject bulletPrefab;
 
-    SpriteRenderer sprtRend;
+    private SpriteRenderer sprtRend;
     public int rowIndex { get; private set; }
     public int columnIndex { get; private set; }
-
-    private int enemyId;
+    private int enemyKind;
     private int score;
     private Color enemyColor;
+
     private int currentLife;
     private int idleSpriteIndex;
     private float timer;
@@ -34,14 +37,14 @@ public class Enemy : MonoBehaviour
         sprtRend = GetComponent<SpriteRenderer>();
     }
 
-    public void Setup(EnemyRepository.EnemyData data, int row, int column)
+    public void Setup(EnemyData data, int row, int column)
     {
-        enemyId = data.id;
-        enemyColor = data.color; //Could ask for color to EnemyRepository using ID each time, 
-                                 //but in this case storing a color doesn't take up too much memory.
+        enemyKind = data.Kind;
+        enemyColor = data.Color; //Could ask for color to EnemyRepository using ID each time, 
+                                    //but in this case storing a color doesn't take up too much memory.
         sprtRend.color = enemyColor;
-        currentLife = data.life;
-        score = data.score;
+        currentLife = data.Life;
+        score = data.Score;
         rowIndex = row;
         columnIndex = column;
     }
@@ -153,8 +156,9 @@ public class Enemy : MonoBehaviour
         return exploded;
     }
 
-    public int GetId()
+    public int GetKind()
     {
-        return enemyId;
+        return enemyKind;
     }
+}
 }

@@ -1,30 +1,26 @@
 ﻿using UnityEngine;
 
-public class EnemyRepository : MonoBehaviour
+namespace Enemies
 {
-
-    [SerializeField] private EnemyData[] repository;
+    [CreateAssetMenu]
+    public class EnemyRepository : ScriptableObject
+    {
+        public EnemyData[] repository;
+    }
 
     [System.Serializable]
     public struct EnemyData
     {
-        public Color color;
-        public int life;
-        public int score;
-        [HideInInspector] public int id;
-    }
+        public Color Color;
+        public int Life;
+        public int Score;
 
-    private void Awake()
-    {
-        for (int i = 0; i < repository.Length; i++)
+        public int Kind
         {
-            repository[i].id = i; //Setting ids based on array index.
+            get
+            {
+                return (Color.GetHashCode().ToString() + Life.ToString() + Score.ToString()).GetHashCode();
+            }
         }
     }
-
-    public EnemyData GetRandomEnemyData()
-    {
-        return repository[Random.Range(0, repository.Length)];
-    }
-
 }
