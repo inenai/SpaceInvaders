@@ -3,24 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LivesCounter : MonoBehaviour {
+public class LivesCounter : MonoBehaviour
+{
 
-	[SerializeField] GameObject lifeIcon;
+    [SerializeField] GameObject lifeIcon;
 
-	Image[] lifeIcons;
+    Image[] lifeIcons;
 
-	public void Setup(int lives) {
-		lifeIcons = new Image[lives];
+    public void Setup(int lives)
+    {
+        lifeIcons = new Image[lives];
 
-		for (int i = 0; i < lives; i++) {
-			GameObject go = Instantiate(lifeIcon, transform);
-			lifeIcons[i] = go.GetComponent<Image>();
-		}
-	}
+        for (int i = 0; i < lives; i++)
+        {
+            GameObject go = Instantiate(lifeIcon, transform);
+            lifeIcons[i] = go.GetComponent<Image>();
+        }
+    }
 
-	public void RemoveLife() {
-		if (transform.childCount > 0)
-			Destroy(transform.GetChild(0).gameObject);
-	}
+    public void RemoveLife()
+    {
+        if (transform.childCount > 0)
+            Destroy(transform.GetChild(0).gameObject);
+    }
 
 }

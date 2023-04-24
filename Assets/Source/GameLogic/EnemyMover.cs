@@ -3,55 +3,65 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class EnemyMover : MonoBehaviour {
+public class EnemyMover : MonoBehaviour
+{
 
-	[SerializeField] float horizontalDistance;
-	[SerializeField] float verticalDistance;
-	[SerializeField] float frequency;
-	[SerializeField] float edgeOffset;
+    [SerializeField] float horizontalDistance;
+    [SerializeField] float verticalDistance;
+    [SerializeField] float frequency;
+    [SerializeField] float edgeOffset;
 
-	SpriteRenderer sprtRend;
+    SpriteRenderer sprtRend;
 
-	bool goDown;
-	bool goRight;
+    bool goDown;
+    bool goRight;
 
-	float timer;
+    float timer;
 
-	private void Awake() {
-		EventDispatcher.OnEnemyReachEdge += OnEnemyReachedEdge;
-		sprtRend = GetComponent<SpriteRenderer>();
-		goRight = true;
-	}
+    private void Awake()
+    {
+        EventDispatcher.OnEnemyReachEdge += OnEnemyReachedEdge;
+        sprtRend = GetComponent<SpriteRenderer>();
+        goRight = true;
+    }
 
-	//If any enemy reached the edge of the screen, next step will be going down, and direction will be the opposite.
-	void OnEnemyReachedEdge(bool goRight) {
-		goDown = true;
-		this.goRight = goRight;
-	}
+    //If any enemy reached the edge of the screen, next step will be going down, and direction will be the opposite.
+    void OnEnemyReachedEdge(bool goRight)
+    {
+        goDown = true;
+        this.goRight = goRight;
+    }
 
-	private void Update() {
-		if (!goDown) {
-			float posToCompare = Camera.main.WorldToViewportPoint(transform.position + new Vector3(sprtRend.bounds.size.x / 2f + edgeOffset, 0f, 0f) * (goRight ? 1f : -1f)).x;
-			if ((goRight && posToCompare > 1f) || (!goRight) && (posToCompare < 0f))
-				EventDispatcher.EnemyReachedEdge(!goRight); //Informs every enemy they should go down and change directions.
-		}
-	}
+    private void Update()
+    {
+        if (!goDown)
+        {
+            float posToCompare = Camera.main.WorldToViewportPoint(transform.position + new Vector3(sprtRend.bounds.size.x / 2f + edgeOffset, 0f, 0f) * (goRight ? 1f : -1f)).x;
+            if ((goRight && posToCompare > 1f) || (!goRight) && (posToCompare < 0f))
+                EventDispatcher.EnemyReachedEdge(!goRight); //Informs every enemy they should go down and change directions.
+        }
+    }
 
-	private void LateUpdate() //Separating actual movement in LateUpdate so every enemy will know where to move next.
-	{
-		timer += Time.deltaTime;
-		if (timer > frequency) {
-			if (goDown) {
-				transform.position -= new Vector3(0f, horizontalDistance, 0f);
-				goDown = false;
-			} else {
-				transform.position += new Vector3(goRight ? horizontalDistance : -horizontalDistance, 0f, 0f);
-			}
-			timer -= frequency;
-		}
-	}
+    private void LateUpdate() //Separating actual movement in LateUpdate so every enemy will know where to move next.
+    {
+        timer += Time.deltaTime;
+        if (timer > frequency)
+        {
+            if (goDown)
+            {
+                transform.position -= new Vector3(0f, horizontalDistance, 0f);
+                goDown = false;
+            }
+            else
+            {
+                transform.position += new Vector3(goRight ? horizontalDistance : -horizontalDistance, 0f, 0f);
+            }
+            timer -= frequency;
+        }
+    }
 
-	private void OnDestroy() {
-		EventDispatcher.OnEnemyReachEdge -= OnEnemyReachedEdge;
-	}
+    private void OnDestroy()
+    {
+        EventDispatcher.OnEnemyReachEdge -= OnEnemyReachedEdge;
+    }
 }
