@@ -1,0 +1,158 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemiesController : MonoBehaviour {
+
+	[Header("Configiration")]
+	[SerializeField] float minFireTime = 0f;
+	[SerializeField] float maxFireTime = 3f;
+	[SerializeField] int enemyRows = 4;
+	[SerializeField] int enemyColumns = 10;
+	[SerializeField] Vector2 offset = new Vector2(0.35f, 0.3f);
+	[SerializeField] Vector2 originViewport = new Vector2(0.2f, 0.9f);
+	[SerializeField] float resetDelay = 0.6f;
+
+	[Header("References")]
+	[SerializeField] GameObject[] enemyPrefabs;
+	[SerializeField] EnemyRepository enemyRepo;
+
+	enum Neighbor { LEFT, RIGHT, UP, DOWN };
+
+	Enemy[][] enemies;
+	HashSet<Enemy> aliveEnemies;
+	List<Enemy> firingEnemies;
+
+	Vector3 vToWorldPoint;
+	Vector2 initialPosition;
+	float currentFireDelay;
+	float fireTimer;
+	bool resetEnemies;
+
+	void Awake() {
+		EventDispatcher.OnEnemyKilled += EnemyKilled;
+		vToWorldPoint = Camera.main.ViewportToWorldPoint(new Vector3(originViewport.x, originViewport.y, 0f));
+	}
+
+	private void Start() {
+		ResetEnemies();
+	}
+
+	void ResetEnemies() {
+		EventDispatcher.EnemyReset();
+		if (firingEnemies != null)
+			firingEnemies.Clear();
+		else
+			firingEnemies = new List<Enemy>();
+		if (aliveEnemies != null)
+			aliveEnemies.Clear();
+		else
+			aliveEnemies = new HashSet<Enemy>();
+		enemies = new Enemy[enemyRows][];
+		for (int i = 0; i < enemyRows; i++) {
+			enemies[i] = new Enemy[enemyColumns];
+		}
+		initialPosition = new Vector2(vToWorldPoint.x, vToWorldPoint.y);
+		currentFireDelay = Random.Range(minFireTime, maxFireTime);
+
+		for (int i = 0; i < enemies.Length; i++) {
+			for (int j = 0; j < enemies[i].Length; j++) {
+				GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Length)], new Vector3(initialPosition.x + (offset.x * j), initialPosition.y - (offset.y * i), 0f), Quaternion.identity, transform);
+				//TODO Improvable: 
+				//Enemies areinstantiated to the right by adding offset. 
+				//Could be instantiated in accordance to viewport so it will look centered in any aspect ratio.
+				enemies[i][j] = enemy.GetComponent<Enemy>();
+				enemies[i][j].Setup(enemyRepo.GetRandomEnemyData(), i, j); //Give random enemy type.
+				aliveEnemies.Add(enemies[i][j]); //Set with alive enemies. Enemies will be reset when this set is empty.
+			}
+		}
+		foreach (Enemy enemy in enemies[enemies.Length - 1]) {
+			firingEnemies.Add(enemy); //At first, all the lower row of enemies will be firing.
+		}
+	}
+
+	void EnemyKilled(int rowIndex, int columnIndex) {
+		List<Vector2Int> enemiesToKill = new List<Vector2Int>(); //Adjacent enemies of the same type will be put here to undergo this same process. 
+		if ((enemies[rowIndex][columnIndex] != null) && !enemies[rowIndex][columnIndex].HasExploded()) {
+			enemies[rowIndex][columnIndex].Explode(true); //Marks enemy as killed.
+			aliveEnemies.Remove(enemies[rowIndex][columnIndex]); //Removed from alive set.
+			if (aliveEnemies.Count == 0) {
+				resetEnemies = true; //No more enemies are alive or not marked as killed.
+									 //TODO It would be cool to have a GameController that, besides resetting enemies, 
+									 //gave the player one extra life with a cap of, say, 5 lives.
+				return;
+			}
+			if (firingEnemies.Contains(enemies[rowIndex][columnIndex])) //If this was a firing enemy, the one avobe will take its place.
+			{
+				firingEnemies.Remove(enemies[rowIndex][columnIndex]);
+				int newRow = rowIndex - 1;
+				//Browse enemies upwards in search for a candidate to start firing instead of this one:
+				while (newRow >= 0 && (enemies[newRow][columnIndex] == null || enemies[newRow][columnIndex].HasExploded())) {
+					newRow--;
+				}
+				if (newRow >= 0 && enemies[newRow][columnIndex] != null)
+					firingEnemies.Add(enemies[newRow][columnIndex]); //If a candidate is found, it will be added to the list of firing enemies.
+			}
+			//Check if any adjacent alive enemies share types with the one being killed:
+			int currentEnemyId = enemies[rowIndex][columnIndex].GetId();
+
+			//Check up
+			if (rowIndex > 0)
+				CheckNeighbor(new Vector2Int(rowIndex - 1, columnIndex), currentEnemyId, enemiesToKill);
+			//Check down
+			if (rowIndex < enemies.Length - 1)
+				CheckNeighbor(new Vector2Int(rowIndex + 1, columnIndex), currentEnemyId, enemiesToKill);
+			//Check left
+			if (columnIndex > 0)
+				CheckNeighbor(new Vector2Int(rowIndex, columnIndex - 1), currentEnemyId, enemiesToKill);
+			//Check right
+			if (columnIndex < enemies[rowIndex].Length - 1)
+				CheckNeighbor(new Vector2Int(rowIndex, columnIndex + 1), currentEnemyId, enemiesToKill);
+
+			foreach (Vector2Int enemyCoords in enemiesToKill) {
+				//Finally, restart this process with any enemies of same type that should die too.
+				EnemyKilled(enemyCoords.x, enemyCoords.y);
+			}
+		}
+	}
+
+	void CheckNeighbor(Vector2Int coords, int currentEnemyId, List<Vector2Int> enemiesToKill) {
+		Enemy neighbor = enemies[coords.x][coords.y];
+		if ((neighbor != null) //Candidate should not be null
+		&& (neighbor.GetId() == currentEnemyId) //Should be same type as current enemy
+		&& !(neighbor.HasExploded())) //And should not be marked as killed already.
+			enemiesToKill.Add(coords);
+	}
+
+	void CheckEnemyToKill(Enemy candidate, Enemy dyingEnemy, List<Vector2Int> candidateList) {
+		if ((candidate != null) && (candidate.GetId() == dyingEnemy.GetId()) && !candidate.HasExploded())
+			candidateList.Add(new Vector2Int(candidate.rowIndex, candidate.columnIndex));
+	}
+
+	float resetTimer;
+	void Update() {
+		if (resetEnemies) {
+			if (resetTimer < resetDelay) //waiting so last explosion will be shown.
+				resetTimer += Time.deltaTime;
+			else {
+				resetEnemies = false;
+				ResetEnemies();
+				resetTimer = 0f;
+				return;
+			}
+		}
+
+		//If the random shooting timer is reached, choose a random firing enemy and make it shoot.
+		if ((fireTimer >= currentFireDelay) && (firingEnemies.Count > 0)) {
+			firingEnemies[Random.Range(0, firingEnemies.Count)].Shoot();
+			currentFireDelay = Random.Range(minFireTime, maxFireTime);
+			fireTimer = 0f;
+		}
+		fireTimer += Time.deltaTime;
+	}
+
+	private void OnDestroy() {
+		EventDispatcher.OnEnemyKilled -= EnemyKilled;
+	}
+}
+
