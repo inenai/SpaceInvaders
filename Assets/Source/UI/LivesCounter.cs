@@ -24,7 +24,9 @@ public class LivesCounter : MonoBehaviour
     public void RemoveLife()
     {
         if (transform.childCount > 0)
-            Destroy(transform.GetChild(0).gameObject);
+        { 
+            Destroy(transform.GetChild(0).gameObject); 
+        }
     }
 
 }

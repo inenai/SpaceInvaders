@@ -49,7 +49,9 @@ public class Player : MonoBehaviour
             }
         }
         else if (!Input.GetButton("Fire")) //Disable continuous bullet instantiation.
+        {
             shot = false;
+        }
     }
 
     private void ToggleFire(bool onPause)
@@ -70,11 +72,15 @@ public class Player : MonoBehaviour
             else
             {
                 if (hitCoroutine != null)
+                {
                     StopCoroutine(hitCoroutine); //Reseting blinking invincibility coroutine.
+                }
                 hitCoroutine = StartCoroutine(Hit());
             }
             if (other.tag.Equals("EnemyBullet"))
+            {
                 other.GetComponent<Bullet>().DestroyBullet();
+            }
             GetComponent<AudioSource>().Play();
         }
     }

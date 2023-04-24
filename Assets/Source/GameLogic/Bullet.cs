@@ -28,9 +28,13 @@ public class Bullet : MonoBehaviour
         GetComponent<BoxCollider>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;
         if (GetComponent<AudioSource>().isPlaying)
+        {
             StartCoroutine(WaitForSoundToEnd()); //Avoid interrupting SFX.
+        }
         else
+        {
             Destroy(gameObject);
+        }
     }
 
     private IEnumerator WaitForSoundToEnd()

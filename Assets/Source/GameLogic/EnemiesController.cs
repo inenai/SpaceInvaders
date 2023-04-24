@@ -44,13 +44,21 @@ public class EnemiesController : MonoBehaviour
     {
         EventDispatcher.EnemyReset();
         if (firingEnemies != null)
+        {
             firingEnemies.Clear();
+        }
         else
+        {
             firingEnemies = new List<Enemy>();
+        }
         if (aliveEnemies != null)
+        {
             aliveEnemies.Clear();
+        }
         else
+        {
             aliveEnemies = new HashSet<Enemy>();
+        }
         enemies = new Enemy[enemyRows][];
         for (int i = 0; i < enemyRows; i++)
         {
@@ -102,23 +110,33 @@ public class EnemiesController : MonoBehaviour
                     newRow--;
                 }
                 if (newRow >= 0 && enemies[newRow][columnIndex] != null)
+                {
                     firingEnemies.Add(enemies[newRow][columnIndex]); //If a candidate is found, it will be added to the list of firing enemies.
+                }
             }
             //Check if any adjacent alive enemies share types with the one being killed:
             int currentEnemyId = enemies[rowIndex][columnIndex].GetId();
 
             //Check up
             if (rowIndex > 0)
+            {
                 CheckNeighbor(new Vector2Int(rowIndex - 1, columnIndex), currentEnemyId, enemiesToKill);
+            }
             //Check down
             if (rowIndex < enemies.Length - 1)
+            {
                 CheckNeighbor(new Vector2Int(rowIndex + 1, columnIndex), currentEnemyId, enemiesToKill);
+            }
             //Check left
             if (columnIndex > 0)
+            {
                 CheckNeighbor(new Vector2Int(rowIndex, columnIndex - 1), currentEnemyId, enemiesToKill);
+            }
             //Check right
             if (columnIndex < enemies[rowIndex].Length - 1)
+            {
                 CheckNeighbor(new Vector2Int(rowIndex, columnIndex + 1), currentEnemyId, enemiesToKill);
+            }
 
             foreach (Vector2Int enemyCoords in enemiesToKill)
             {
@@ -134,21 +152,27 @@ public class EnemiesController : MonoBehaviour
         if ((neighbor != null) //Candidate should not be null
         && (neighbor.GetId() == currentEnemyId) //Should be same type as current enemy
         && !(neighbor.HasExploded())) //And should not be marked as killed already.
+        { 
             enemiesToKill.Add(coords);
+        }
     }
 
     private void CheckEnemyToKill(Enemy candidate, Enemy dyingEnemy, List<Vector2Int> candidateList)
     {
         if ((candidate != null) && (candidate.GetId() == dyingEnemy.GetId()) && !candidate.HasExploded())
+        {
             candidateList.Add(new Vector2Int(candidate.rowIndex, candidate.columnIndex));
+        }
     }
 
     private void Update()
     {
         if (resetEnemies)
         {
-            if (resetTimer < resetDelay) //waiting so last explosion will be shown.
+            if (resetTimer < resetDelay)
+            {  //waiting so last explosion will be shown.
                 resetTimer += Time.deltaTime;
+            }
             else
             {
                 resetEnemies = false;

@@ -36,7 +36,9 @@ public class EnemyMover : MonoBehaviour
         {
             float posToCompare = Camera.main.WorldToViewportPoint(transform.position + new Vector3(sprtRend.bounds.size.x / 2f + edgeOffset, 0f, 0f) * (goRight ? 1f : -1f)).x;
             if ((goRight && posToCompare > 1f) || (!goRight) && (posToCompare < 0f))
+            {
                 EventDispatcher.EnemyReachedEdge(!goRight); //Informs every enemy they should go down and change directions.
+            }
         }
     }
 

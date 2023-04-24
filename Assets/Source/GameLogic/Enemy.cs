@@ -69,7 +69,9 @@ public class Enemy : MonoBehaviour
     public void Shoot()
     {
         if (!HasExploded())
+        {
             Instantiate(bulletPrefab, firePivot.position, Quaternion.identity);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -84,7 +86,9 @@ public class Enemy : MonoBehaviour
             else
             {
                 if (hitCoroutine != null)
+                {
                     StopCoroutine(hitCoroutine);
+                }
                 hitCoroutine = StartCoroutine(Hit());
             }
             other.GetComponent<Bullet>().DestroyBullet();
@@ -112,7 +116,9 @@ public class Enemy : MonoBehaviour
     public void Explode(bool autoKill = false)
     {
         if (!autoKill) //Gives score only if was killed by player.
+        {  
             EventDispatcher.ScoreGained(score);
+        }
         currentLife = 0;
         GetComponent<EnemyMover>().enabled = false;
         if (hitCoroutine != null)
@@ -121,7 +127,9 @@ public class Enemy : MonoBehaviour
             hitCoroutine = null;
         }
         if (!autoKill) //Only trigger checking for same-type neighbours if death cause wasn't reaching the bottom of the screen.
+        {  
             EventDispatcher.EnemyKilled(rowIndex, columnIndex);
+        }
         exploded = true; //Mark as killed.
         sprtRend.color = enemyColor; //Avoid white explosion if was being hit when killed
         sprtRend.sprite = dieSprite;

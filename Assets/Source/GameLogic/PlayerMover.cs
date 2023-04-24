@@ -28,6 +28,8 @@ public class PlayerMover : MonoBehaviour
     {
         float value = Input.GetAxisRaw("Horizontal");
         if (Mathf.Abs(value) > 0.1f)
+        {
             transform.position = new Vector3(Mathf.Clamp(transform.position.x + Time.deltaTime * value * speed, minXPos, maxXPos), transform.position.y, transform.position.z);
+        }
     }
 }
