@@ -162,14 +162,6 @@ namespace Enemies
             }
         }
 
-        private void CheckEnemyToKill(Enemy candidate, Enemy dyingEnemy, List<Vector2Int> candidateList)
-        {
-            if ((candidate != null) && (candidate.GetKind() == dyingEnemy.GetKind()) && !candidate.HasExploded())
-            {
-                candidateList.Add(new Vector2Int(candidate.rowIndex, candidate.columnIndex));
-            }
-        }
-
         private void Update()
         {
             if (resetEnemies)
