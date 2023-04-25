@@ -7,7 +7,7 @@ using System;
 public class EventDispatcher : MonoBehaviour
 {
 
-    public static Action<int, int> OnEnemyKilled = delegate { };
+    public static Action<int, int, bool> OnEnemyKilled = delegate { };
     public static Action OnEnemyReset = delegate { };
     public static Action<bool> OnEnemyReachEdge = delegate { };
     public static Action<int> OnScoreGained = delegate { };
@@ -17,9 +17,9 @@ public class EventDispatcher : MonoBehaviour
     public static Action OnPlayerHit = delegate { };
     public static Action OnPlayerKilled = delegate { };
 
-    public static void EnemyKilled(int rowIndex, int columnIndex)
+    public static void EnemyKilled(int rowIndex, int columnIndex, bool autoKill)
     {
-        OnEnemyKilled(rowIndex, columnIndex);
+        OnEnemyKilled(rowIndex, columnIndex, autoKill);
     }
 
     public static void EnemyReset()

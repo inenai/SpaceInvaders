@@ -14,7 +14,7 @@ public class ActionWhenOffscreen : MonoBehaviour
     private void Update()
     {
         yPosViewport = Camera.main.WorldToViewportPoint(transform.position).y;
-        if (yPosViewport < (0f - offset) || yPosViewport > (1 + offset))
+        if (yPosViewport < (0f + offset) || yPosViewport > (1 - offset))
         {
             action.Invoke();
         }

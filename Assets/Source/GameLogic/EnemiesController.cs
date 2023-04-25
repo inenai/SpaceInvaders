@@ -91,8 +91,10 @@ namespace Enemies
             }
         }
 
-        private void EnemyKilled(int rowIndex, int columnIndex)
+        private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill)
         {
+            if (autoKill) return;
+
             List<Vector2Int> enemiesToKill = new List<Vector2Int>(); //Adjacent enemies of the same type will be put here to undergo this same process. 
             if ((enemies[rowIndex][columnIndex] != null) && !enemies[rowIndex][columnIndex].HasExploded())
             {
@@ -146,7 +148,7 @@ namespace Enemies
                 foreach (Vector2Int enemyCoords in enemiesToKill)
                 {
                     //Finally, restart this process with any enemies of same type that should die too.
-                    EnemyKilled(enemyCoords.x, enemyCoords.y);
+                    EnemyKilled(enemyCoords.x, enemyCoords.y, autoKill);
                 }
             }
         }

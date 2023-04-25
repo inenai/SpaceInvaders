@@ -38,7 +38,7 @@ public class SoundManager : MonoBehaviour
         playeKilledSrc.Play();
     }
 
-    private void EnemyKilled(int rowIndex, int columnIndex)
+    private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill)
     {
         enemyKilledSrc.Play();
     }

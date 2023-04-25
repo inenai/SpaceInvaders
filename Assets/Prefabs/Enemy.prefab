@@ -194,13 +194,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56637a67ec5b89c41921a33aa1bda343, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: 0
+  offset: 0.05
   action:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 114159063805058614}
-        m_MethodName: Explode
-        m_Mode: 6
+        m_MethodName: AutoKill
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

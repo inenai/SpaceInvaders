@@ -128,10 +128,9 @@ namespace Enemies
                 StopCoroutine(hitCoroutine); //Reset hit sprite color change coroutine.
                 hitCoroutine = null;
             }
-            if (!autoKill) //Only trigger checking for same-type neighbours if death cause wasn't reaching the bottom of the screen.
-            {
-                EventDispatcher.EnemyKilled(rowIndex, columnIndex);
-            }
+           
+            EventDispatcher.EnemyKilled(rowIndex, columnIndex, autoKill);
+            
             exploded = true; //Mark as killed.
             sprtRend.color = enemyColor; //Avoid white explosion if was being hit when killed
             sprtRend.sprite = dieSprite;
