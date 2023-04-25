@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     private bool shot;
     private int currentLife;
     private bool onPause;
+    private bool playerDead;
     private Coroutine hitCoroutine = null;
 
     private void Awake()
@@ -41,7 +42,7 @@ public class Player : MonoBehaviour
     {
         if (Input.GetButton("Fire") && !shot)
         {
-            if (!onPause)
+            if (!(onPause || playerDead))
             {
                 Instantiate(bullet, firePivot.position, Quaternion.identity);
                 shot = true;
@@ -85,7 +86,8 @@ public class Player : MonoBehaviour
     }
 
     private IEnumerator EndGame()
-    { //Shows enemy exploding before ending game.
+    { //Shows player exploding before ending game.
+        playerDead = true;
         GetComponent<PlayerMover>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;
         explosion.SetActive(true);
