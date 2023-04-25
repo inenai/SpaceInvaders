@@ -12,6 +12,10 @@ public class EventDispatcher : MonoBehaviour
     public static Action<bool> OnEnemyReachEdge = delegate { };
     public static Action<int> OnScoreGained = delegate { };
     public static Action<bool> OnPauseMenuOpen = delegate { };
+    public static Action OnPlayerShot = delegate { };
+    public static Action OnEnemyShot = delegate { };
+    public static Action OnPlayerHit = delegate { };
+    public static Action OnPlayerKilled = delegate { };
 
     public static void EnemyKilled(int rowIndex, int columnIndex)
     {
@@ -23,7 +27,7 @@ public class EventDispatcher : MonoBehaviour
         OnEnemyReset();
     }
 
-    public static void EnemyReachedEdge(bool goRight)
+    public static void EnemyReachedLateralEdge(bool goRight)
     {
         OnEnemyReachEdge(goRight);
     }
@@ -36,5 +40,25 @@ public class EventDispatcher : MonoBehaviour
     public static void PauseMenuOpen(bool open)
     {
         OnPauseMenuOpen(open);
+    }
+
+    public static void PlayerShot()
+    {
+        OnPlayerShot();
+    }
+
+    public static void EnemyShot()
+    {
+        OnEnemyShot();
+    }
+
+    public static void PlayerHit()
+    {
+        OnPlayerHit();
+    }
+
+    public static void PlayerKilled()
+    {
+        OnPlayerKilled();
     }
 }

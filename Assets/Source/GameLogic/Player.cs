@@ -2,7 +2,6 @@
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerMover))]
-[RequireComponent(typeof(AudioSource))]
 [RequireComponent(typeof(SpriteRenderer))]
 public class Player : MonoBehaviour
 {
@@ -19,7 +18,6 @@ public class Player : MonoBehaviour
     [SerializeField] private LivesCounter livesCounter;
     [SerializeField] private SceneLoader sceneLoader;
     [SerializeField] private GameObject explosion;
-    [SerializeField] private AudioClip dieSoundEffect;
 
     private bool shot;
     private int currentLife;
@@ -44,6 +42,7 @@ public class Player : MonoBehaviour
         {
             if (!(onPause || playerDead))
             {
+                EventDispatcher.PlayerShot();
                 Instantiate(bullet, firePivot.position, Quaternion.identity);
                 shot = true;
             }
@@ -81,7 +80,6 @@ public class Player : MonoBehaviour
             {
                 other.GetComponent<Bullet>().DestroyBullet();
             }
-            GetComponent<AudioSource>().Play();
         }
     }
 
@@ -91,7 +89,7 @@ public class Player : MonoBehaviour
         GetComponent<PlayerMover>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;
         explosion.SetActive(true);
-        GetComponent<AudioSource>().PlayOneShot(dieSoundEffect);
+        EventDispatcher.PlayerKilled();
         yield return new WaitForSeconds(1f);
         explosion.SetActive(false);
         yield return new WaitForSeconds(1f);
@@ -100,6 +98,7 @@ public class Player : MonoBehaviour
 
     private IEnumerator Hit() //Blinking invincibility effect on hit.
     {
+        EventDispatcher.PlayerHit();
         GetComponent<BoxCollider>().enabled = false;
         for (int i = 0; i < 3; i++)
         {

@@ -6,7 +6,6 @@ namespace Enemies
 
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(BoxCollider))]
-    [RequireComponent(typeof(AudioSource))]
     [RequireComponent(typeof(EnemyMover))]
     public class Enemy : MonoBehaviour
     {
@@ -73,6 +72,7 @@ namespace Enemies
             if (!HasExploded())
             {
                 Instantiate(bulletPrefab, firePivot.position, Quaternion.identity);
+                EventDispatcher.EnemyShot();
             }
         }
 
@@ -135,7 +135,6 @@ namespace Enemies
             exploded = true; //Mark as killed.
             sprtRend.color = enemyColor; //Avoid white explosion if was being hit when killed
             sprtRend.sprite = dieSprite;
-            GetComponent<AudioSource>().Play();
             StartCoroutine(DestroyEnemy());
         }
 
@@ -143,11 +142,7 @@ namespace Enemies
         {
             GetComponent<BoxCollider>().enabled = false;
             yield return new WaitForSeconds(idleFrequency); //So exploding effect will last enough to be properly seen.
-            GetComponent<SpriteRenderer>().enabled = false;
-            while (GetComponent<AudioSource>().isPlaying) //So sound won't be interrupted.
-            {
-                yield return new WaitForEndOfFrame();
-            }
+            GetComponent<SpriteRenderer>().enabled = false;            
             Destroy(gameObject); //Improvable: Could use disable instead of destroy and reuse+reset assets each game.
         }
 
