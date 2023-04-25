@@ -93,20 +93,9 @@ namespace Enemies
 
         private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill)
         {
-            if (autoKill) return;
-
-            List<Vector2Int> enemiesToKill = new List<Vector2Int>(); //Adjacent enemies of the same type will be put here to undergo this same process. 
             if ((enemies[rowIndex][columnIndex] != null) && !enemies[rowIndex][columnIndex].HasExploded())
             {
-                enemies[rowIndex][columnIndex].Explode(true); //Marks enemy as killed.
-                aliveEnemies.Remove(enemies[rowIndex][columnIndex]); //Removed from alive set.
-                if (aliveEnemies.Count == 0)
-                {
-                    resetEnemies = true; //No more enemies are alive or not marked as killed.
-                                         //TODO It would be cool to have a GameController that, besides resetting enemies, 
-                                         //gave the player one extra life with a cap of, say, 5 lives.
-                    return;
-                }
+                //Firing re-calculation
                 if (firingEnemies.Contains(enemies[rowIndex][columnIndex])) //If this was a firing enemy, the one avobe will take its place.
                 {
                     firingEnemies.Remove(enemies[rowIndex][columnIndex]);
@@ -120,7 +109,37 @@ namespace Enemies
                     {
                         firingEnemies.Add(enemies[newRow][columnIndex]); //If a candidate is found, it will be added to the list of firing enemies.
                     }
+                }               
+            }
+
+            if (autoKill) 
+            {
+                aliveEnemies.Remove(enemies[rowIndex][columnIndex]); //Removed from alive set.
+                if (aliveEnemies.Count == 0)
+                {
+                    resetEnemies = true; //No more enemies are alive or not marked as killed.
+                                         //TODO It would be cool to have a GameController that, besides resetting enemies, 
+                                         //gave the player one extra life with a cap of, say, 5 lives.
+                    return;
                 }
+                return;
+            } 
+
+            List<Vector2Int> enemiesToKill = new List<Vector2Int>(); //Adjacent enemies of the same type will be put here to undergo this same process. 
+            if ((enemies[rowIndex][columnIndex] != null) && !enemies[rowIndex][columnIndex].HasExploded())
+            {
+                //Terminate the enemy
+                enemies[rowIndex][columnIndex].Explode(true); //Marks enemy as killed.
+                aliveEnemies.Remove(enemies[rowIndex][columnIndex]); //Removed from alive set.
+                if (aliveEnemies.Count == 0)
+                {
+                    resetEnemies = true; //No more enemies are alive or not marked as killed.
+                                         //TODO It would be cool to have a GameController that, besides resetting enemies, 
+                                         //gave the player one extra life with a cap of, say, 5 lives.
+                    return;
+                }
+
+                //Neighbors
                 //Check if any adjacent alive enemies share types with the one being killed:
                 int currentEnemyId = enemies[rowIndex][columnIndex].GetKind();
 
