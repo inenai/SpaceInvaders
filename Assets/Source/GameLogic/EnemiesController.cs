@@ -93,93 +93,99 @@ namespace Enemies
 
         private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill)
         {
-            if ((enemies[rowIndex][columnIndex] != null) && !enemies[rowIndex][columnIndex].HasExploded())
+            aliveEnemies.Remove(enemies[rowIndex][columnIndex]);
+
+            if (aliveEnemies.Count == 0)
             {
-                //Firing re-calculation
-                if (firingEnemies.Contains(enemies[rowIndex][columnIndex])) //If this was a firing enemy, the one avobe will take its place.
-                {
-                    firingEnemies.Remove(enemies[rowIndex][columnIndex]);
-                    int newRow = rowIndex - 1;
-                    //Browse enemies upwards in search for a candidate to start firing instead of this one:
-                    while (newRow >= 0 && (enemies[newRow][columnIndex] == null || enemies[newRow][columnIndex].HasExploded()))
-                    {
-                        newRow--;
-                    }
-                    if (newRow >= 0 && enemies[newRow][columnIndex] != null)
-                    {
-                        firingEnemies.Add(enemies[newRow][columnIndex]); //If a candidate is found, it will be added to the list of firing enemies.
-                    }
-                }               
+                resetEnemies = true; //No more enemies are alive or not marked as killed.
+                return;
             }
 
-            if (autoKill) 
+            if (!autoKill)
             {
-                aliveEnemies.Remove(enemies[rowIndex][columnIndex]); //Removed from alive set.
-                if (aliveEnemies.Count == 0)
-                {
-                    resetEnemies = true; //No more enemies are alive or not marked as killed.
-                                         //TODO It would be cool to have a GameController that, besides resetting enemies, 
-                                         //gave the player one extra life with a cap of, say, 5 lives.
-                    return;
-                }
-                return;
-            } 
+                KillSameTypeNeighbors(rowIndex, columnIndex);
+            }
 
-            List<Vector2Int> enemiesToKill = new List<Vector2Int>(); //Adjacent enemies of the same type will be put here to undergo this same process. 
-            if ((enemies[rowIndex][columnIndex] != null) && !enemies[rowIndex][columnIndex].HasExploded())
+            RecalculateFiringEnemies(rowIndex, columnIndex);
+        }
+
+        private void RecalculateFiringEnemies(int rowIndex, int columnIndex) {
+            if (firingEnemies.Contains(enemies[rowIndex][columnIndex])) //If this was a firing enemy, the one avobe will take its place.
             {
-                //Terminate the enemy
-                enemies[rowIndex][columnIndex].Explode(true); //Marks enemy as killed.
-                aliveEnemies.Remove(enemies[rowIndex][columnIndex]); //Removed from alive set.
-                if (aliveEnemies.Count == 0)
+                firingEnemies.Remove(enemies[rowIndex][columnIndex]);
+                int newRow = rowIndex - 1;
+                //Browse enemies upwards in search for a candidate to start firing instead of this one:
+                while (newRow >= 0 && (enemies[newRow][columnIndex] == null || enemies[newRow][columnIndex].IsDead()))
                 {
-                    resetEnemies = true; //No more enemies are alive or not marked as killed.
-                                         //TODO It would be cool to have a GameController that, besides resetting enemies, 
-                                         //gave the player one extra life with a cap of, say, 5 lives.
-                    return;
+                    newRow--;
                 }
-
-                //Neighbors
-                //Check if any adjacent alive enemies share types with the one being killed:
-                int currentEnemyId = enemies[rowIndex][columnIndex].GetKind();
-
-                //Check up
-                if (rowIndex > 0)
+                if (newRow >= 0 && enemies[newRow][columnIndex] != null)
                 {
-                    CheckNeighbor(new Vector2Int(rowIndex - 1, columnIndex), currentEnemyId, enemiesToKill);
-                }
-                //Check down
-                if (rowIndex < enemies.Length - 1)
-                {
-                    CheckNeighbor(new Vector2Int(rowIndex + 1, columnIndex), currentEnemyId, enemiesToKill);
-                }
-                //Check left
-                if (columnIndex > 0)
-                {
-                    CheckNeighbor(new Vector2Int(rowIndex, columnIndex - 1), currentEnemyId, enemiesToKill);
-                }
-                //Check right
-                if (columnIndex < enemies[rowIndex].Length - 1)
-                {
-                    CheckNeighbor(new Vector2Int(rowIndex, columnIndex + 1), currentEnemyId, enemiesToKill);
-                }
-
-                foreach (Vector2Int enemyCoords in enemiesToKill)
-                {
-                    //Finally, restart this process with any enemies of same type that should die too.
-                    EnemyKilled(enemyCoords.x, enemyCoords.y, autoKill);
+                    firingEnemies.Add(enemies[newRow][columnIndex]); //If a candidate is found, it will be added to the list of firing enemies.
                 }
             }
         }
 
-        private void CheckNeighbor(Vector2Int coords, int currentEnemyId, List<Vector2Int> enemiesToKill)
-        {
-            Enemy neighbor = enemies[coords.x][coords.y];
-            if ((neighbor != null) //Candidate should not be null
-            && (neighbor.GetKind() == currentEnemyId) //Should be same type as current enemy
-            && !(neighbor.HasExploded())) //And should not be marked as killed already.
+        private void KillSameTypeNeighbors(int rowIndex, int columnIndex) {
+            List<Vector2Int> enemiesToKill = new List<Vector2Int>(); //Adjacent enemies of the same type will be put here to undergo this same process. 
+            Queue<Vector2Int> neighbors = new Queue<Vector2Int>();
+
+            //Check if any adjacent alive enemies share types with the one being killed:
+            int enemyType = enemies[rowIndex][columnIndex].GetKind();
+
+            neighbors.Enqueue(new Vector2Int(rowIndex, columnIndex)); //Start with killed by player enemy
+
+            while (neighbors.Count > 0)
             {
-                enemiesToKill.Add(coords);
+                Vector2Int currentNeighbor = neighbors.Dequeue();
+
+                //Check up
+                if (rowIndex > 0)
+                {
+                   CheckNeighbor(new Vector2Int(currentNeighbor.x - 1, currentNeighbor.y), enemyType, neighbors);
+                }
+                //Check down
+                if (rowIndex < enemies.Length - 1)
+                {
+                    CheckNeighbor(new Vector2Int(currentNeighbor.x + 1, currentNeighbor.y), enemyType, neighbors);
+                }
+                //Check left
+                if (columnIndex > 0)
+                {
+                    CheckNeighbor(new Vector2Int(currentNeighbor.x, currentNeighbor.y - 1), enemyType, neighbors);
+                }
+                //Check right
+                if (columnIndex < enemies[currentNeighbor.x].Length - 1)
+                {
+                    CheckNeighbor(new Vector2Int(currentNeighbor.x, currentNeighbor.y + 1), enemyType, neighbors);
+                }
+               
+                if (currentNeighbor.x != rowIndex || currentNeighbor.y != columnIndex)  //Do not kill already killed by player enemy
+                {
+                    enemies[currentNeighbor.x][currentNeighbor.y].MarkForKill();
+                    enemiesToKill.Add(currentNeighbor);
+                }                                
+            }
+
+            foreach (Vector2Int enemyCoords in enemiesToKill)
+            {
+                //Finally, restart this process with any enemies of same type that should die too.
+                enemies[enemyCoords.x][enemyCoords.y].Kill(true);
+            }
+            
+        }
+
+        private void CheckNeighbor(Vector2Int coords, int currentEnemyId, Queue<Vector2Int> neighbors)
+        {
+            if (coords.x < 0 || coords.y < 0) return;
+            if (coords.x >= enemies.Length || coords.y >= enemies[coords.x].Length) return;
+
+            Enemy neighbor = enemies[coords.x][coords.y];
+
+            if ((neighbor.GetKind() == currentEnemyId) //Should be same type as current enemy
+            && !(neighbor.MarkedForKill())) //And should not be marked for kill already.
+            {
+                neighbors.Enqueue(coords);
             }
         }
 

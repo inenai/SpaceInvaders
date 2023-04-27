@@ -29,7 +29,7 @@ namespace Enemies
         private int currentLife;
         private int idleSpriteIndex;
         private float timer;
-        private bool exploded;
+        private bool dead;
 
         private void Awake()
         {
@@ -69,7 +69,7 @@ namespace Enemies
 
         public void Shoot()
         {
-            if (!HasExploded())
+            if (!IsDead())
             {
                 Instantiate(bulletPrefab, firePivot.position, Quaternion.identity);
                 EventDispatcher.EnemyShot();
@@ -83,7 +83,7 @@ namespace Enemies
                 currentLife--;
                 if (currentLife == 0)
                 {
-                    Explode();
+                    Kill();
                 }
                 else
                 {
@@ -106,17 +106,13 @@ namespace Enemies
             hitCoroutine = null;
         }
 
-        public void AutoKill()
-        {
-            Explode(true);
-        }
-
         /// <summary>
         /// Explode marks the enemy as killed and sends an event that EnemiesController will receive to process this kill.
         /// </summary>
         /// <param name="autoKill"></param>
-        public void Explode(bool autoKill = false)
+        public void Kill(bool autoKill = false)
         {
+            dead = true; //Mark as killed.
             if (!autoKill) //Gives score only if was killed by player.
             {
                 EventDispatcher.ScoreGained(score);
@@ -128,13 +124,23 @@ namespace Enemies
                 StopCoroutine(hitCoroutine); //Reset hit sprite color change coroutine.
                 hitCoroutine = null;
             }
-           
+
             EventDispatcher.EnemyKilled(rowIndex, columnIndex, autoKill);
-            
-            exploded = true; //Mark as killed.
+
             sprtRend.color = enemyColor; //Avoid white explosion if was being hit when killed
             sprtRend.sprite = dieSprite;
             StartCoroutine(DestroyEnemy());
+        }
+
+        bool marked;
+        public void MarkForKill()
+        {
+            marked = true;
+        }
+
+        public bool MarkedForKill()
+        {
+            return marked;
         }
 
         private IEnumerator DestroyEnemy()
@@ -145,9 +151,9 @@ namespace Enemies
             Destroy(gameObject); //Improvable: Could use disable instead of destroy and reuse+reset assets each game.
         }
 
-        public bool HasExploded()
+        public bool IsDead()
         {
-            return exploded;
+            return dead;
         }
 
         public int GetKind()
