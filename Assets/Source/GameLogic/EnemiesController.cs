@@ -91,7 +91,7 @@ namespace Enemies
             }
         }
 
-        private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill)
+        private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill, float xCoord)
         {
             aliveEnemies.Remove(enemies[rowIndex][columnIndex]);
 

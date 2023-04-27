@@ -7,19 +7,19 @@ using System;
 public class EventDispatcher : MonoBehaviour
 {
 
-    public static Action<int, int, bool> OnEnemyKilled = delegate { };
+    public static Action<int, int, bool, float> OnEnemyKilled = delegate { };
     public static Action OnEnemyReset = delegate { };
     public static Action<bool> OnEnemyReachEdge = delegate { };
     public static Action<int> OnScoreGained = delegate { };
     public static Action<bool> OnPauseMenuOpen = delegate { };
-    public static Action OnPlayerShot = delegate { };
-    public static Action OnEnemyShot = delegate { };
-    public static Action OnPlayerHit = delegate { };
-    public static Action OnPlayerKilled = delegate { };
+    public static Action<float> OnPlayerShot = delegate { };
+    public static Action<float> OnEnemyShot = delegate { };
+    public static Action<float> OnPlayerHit = delegate { };
+    public static Action<float> OnPlayerKilled = delegate { };
 
-    public static void EnemyKilled(int rowIndex, int columnIndex, bool autoKill)
+    public static void EnemyKilled(int rowIndex, int columnIndex, bool autoKill, float xCoord)
     {
-        OnEnemyKilled(rowIndex, columnIndex, autoKill);
+        OnEnemyKilled(rowIndex, columnIndex, autoKill, xCoord);
     }
 
     public static void EnemyReset()
@@ -42,23 +42,23 @@ public class EventDispatcher : MonoBehaviour
         OnPauseMenuOpen(open);
     }
 
-    public static void PlayerShot()
+    public static void PlayerShot(float xCoord)
     {
-        OnPlayerShot();
+        OnPlayerShot(xCoord);
     }
 
-    public static void EnemyShot()
+    public static void EnemyShot(float xCoord)
     {
-        OnEnemyShot();
+        OnEnemyShot(xCoord);
     }
 
-    public static void PlayerHit()
+    public static void PlayerHit(float xCoord)
     {
-        OnPlayerHit();
+        OnPlayerHit(xCoord);
     }
 
-    public static void PlayerKilled()
+    public static void PlayerKilled(float xCoord)
     {
-        OnPlayerKilled();
+        OnPlayerKilled(xCoord);
     }
 }

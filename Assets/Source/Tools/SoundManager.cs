@@ -19,27 +19,32 @@ public class SoundManager : MonoBehaviour
         EventDispatcher.OnEnemyKilled += EnemyKilled;
     }
 
-    private void PlayerShot() {
+    private void PlayerShot(float xCoord) {
+        playerShotSrc.panStereo = (xCoord * 2f) - 1f;
         playerShotSrc.Play();
     }
 
-    private void EnemyShot()
+    private void EnemyShot(float xCoord)
     {
+        enemyShotSrc.panStereo = (xCoord * 2f) - 1f;
         enemyShotSrc.Play();
     }
 
-    private void PlayerHit()
+    private void PlayerHit(float xCoord)
     {
+        playerHitSrc.panStereo = (xCoord * 2f) - 1f;
         playerHitSrc.Play();
     }
 
-    private void PlayerKilled()
+    private void PlayerKilled(float xCoord)
     {
+        playeKilledSrc.panStereo = (xCoord * 2f) - 1f;
         playeKilledSrc.Play();
     }
 
-    private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill)
+    private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill, float xCoord)
     {
+        enemyKilledSrc.panStereo = (xCoord * 2f) - 1f;
         enemyKilledSrc.Play();
     }
 

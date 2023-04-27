@@ -42,7 +42,8 @@ public class Player : MonoBehaviour
         {
             if (!(onPause || playerDead))
             {
-                EventDispatcher.PlayerShot();
+                float xCoord = Camera.main.WorldToViewportPoint(transform.position).x;
+                EventDispatcher.PlayerShot(xCoord);
                 Instantiate(bullet, firePivot.position, Quaternion.identity);
                 shot = true;
             }
@@ -89,7 +90,8 @@ public class Player : MonoBehaviour
         GetComponent<PlayerMover>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;
         explosion.SetActive(true);
-        EventDispatcher.PlayerKilled();
+        float xCoord = Camera.main.WorldToViewportPoint(transform.position).x;
+        EventDispatcher.PlayerKilled(xCoord);
         yield return new WaitForSeconds(1f);
         explosion.SetActive(false);
         yield return new WaitForSeconds(1f);
@@ -98,7 +100,8 @@ public class Player : MonoBehaviour
 
     private IEnumerator Hit() //Blinking invincibility effect on hit.
     {
-        EventDispatcher.PlayerHit();
+        float xCoord = Camera.main.WorldToViewportPoint(transform.position).x;
+        EventDispatcher.PlayerHit(xCoord);
         GetComponent<BoxCollider>().enabled = false;
         for (int i = 0; i < 3; i++)
         {

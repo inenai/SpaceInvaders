@@ -72,10 +72,11 @@ namespace Enemies
             if (!IsDead())
             {
                 Instantiate(bulletPrefab, firePivot.position, Quaternion.identity);
-                EventDispatcher.EnemyShot();
+                float xCoord = Camera.main.WorldToViewportPoint(transform.position).x;
+                EventDispatcher.EnemyShot(xCoord);
             }
         }
-
+        
         private void OnTriggerEnter(Collider other)
         {
             if (other.tag.Equals("PlayerBullet"))
@@ -125,7 +126,8 @@ namespace Enemies
                 hitCoroutine = null;
             }
 
-            EventDispatcher.EnemyKilled(rowIndex, columnIndex, autoKill);
+            float xCoord = Camera.main.WorldToViewportPoint(transform.position).x;
+            EventDispatcher.EnemyKilled(rowIndex, columnIndex, autoKill, xCoord);
 
             sprtRend.color = enemyColor; //Avoid white explosion if was being hit when killed
             sprtRend.sprite = dieSprite;
