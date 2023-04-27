@@ -18,6 +18,7 @@ namespace Enemies
         [SerializeField] private Sprite[] idleSprites;
         [SerializeField] private Sprite dieSprite;
         [SerializeField] private GameObject bulletPrefab;
+        [SerializeField] private ParticleSystem aboutToDieParticles;
 
         private SpriteRenderer sprtRend;
         public int rowIndex { get; private set; }
@@ -88,6 +89,9 @@ namespace Enemies
                 }
                 else
                 {
+                    if (currentLife == 1) {
+                        aboutToDieParticles.Play();
+                    }
                     if (hitCoroutine != null)
                     {
                         StopCoroutine(hitCoroutine);
@@ -114,7 +118,7 @@ namespace Enemies
         public void Kill(bool autoKill = false)
         {
             dead = true; //Mark as killed.
-            if (!autoKill) //Gives score only if was killed by player.
+            if (!autoKill) //Gives score only if was killed by player. By design.
             {
                 EventDispatcher.ScoreGained(score);
             }
