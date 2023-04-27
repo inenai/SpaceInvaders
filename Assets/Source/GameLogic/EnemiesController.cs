@@ -160,7 +160,7 @@ namespace Enemies
                     CheckNeighbor(new Vector2Int(currentNeighbor.x, currentNeighbor.y + 1), enemyType, neighbors);
                 }
                
-                if (currentNeighbor.x != rowIndex || currentNeighbor.y != columnIndex)  //Do not kill already killed by player enemy
+                if (currentNeighbor.x != rowIndex || currentNeighbor.y != columnIndex)  //Do not mark for kill the enemy that was originally killed by the player
                 {
                     enemies[currentNeighbor.x][currentNeighbor.y].MarkForKill();
                     enemiesToKill.Add(currentNeighbor);
@@ -169,7 +169,7 @@ namespace Enemies
 
             foreach (Vector2Int enemyCoords in enemiesToKill)
             {
-                //Finally, restart this process with any enemies of same type that should die too.
+                //Finally, kill all found neighbors.
                 enemies[enemyCoords.x][enemyCoords.y].Kill(true);
             }
             
