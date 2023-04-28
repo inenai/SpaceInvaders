@@ -22,6 +22,7 @@ namespace Enemies
         [SerializeField] private BulletPool bulletPool;
 
         private Enemy[][] enemies;
+        private ObjectPool<Enemy> enemyPool;
         private HashSet<Enemy> aliveEnemies;
         private List<Enemy> firingEnemies;
         private Vector3 vToWorldPoint;
@@ -44,7 +45,24 @@ namespace Enemies
 
         private void Start()
         {
+            enemyPool = new ObjectPool<Enemy>(CreateEnemy, OnGetEnemyFromPool, OnReturnEnemyToPool);
             ResetEnemies();
+        }
+
+        private void OnGetEnemyFromPool(Enemy enemy)
+        { 
+            enemy.gameObject.SetActive(true);
+        }
+
+        private void OnReturnEnemyToPool(Enemy enemy)
+        {
+            enemy.gameObject.SetActive(false);
+        }
+
+        private Enemy CreateEnemy()
+        {
+            GameObject enemyGO = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Length)]);
+            return enemyGO.GetComponent<Enemy>();
         }
 
         private void ResetEnemies()
@@ -78,12 +96,15 @@ namespace Enemies
             {
                 for (int j = 0; j < enemies[i].Length; j++)
                 {
-                    GameObject enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Length)], new Vector3(initialPosition.x + (offset.x * j), initialPosition.y - (offset.y * i), 0f), Quaternion.identity, transform);
+                    Enemy enemy = enemyPool.Get();
+                    enemy.transform.position = new Vector3(initialPosition.x + (offset.x * j), initialPosition.y - (offset.y * i), 0f);
+                    enemy.transform.SetParent(transform);
+                    enemy.Reset();
                     //TODO Improvable: 
                     //Enemies areinstantiated to the right by adding offset. 
                     //Could be instantiated in accordance to viewport so it will look centered in any aspect ratio.
                     enemies[i][j] = enemy.GetComponent<Enemy>();
-                    enemies[i][j].Setup(GetRandomEnemyData(), i, j, bulletPool); //Give random enemy type.
+                    enemies[i][j].Setup(GetRandomEnemyData(), i, j, bulletPool, enemyPool); //Give random enemy type.
                     aliveEnemies.Add(enemies[i][j]); //Set with alive enemies. Enemies will be reset when this set is empty.
                 }
             }

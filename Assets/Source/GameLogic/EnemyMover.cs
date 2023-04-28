@@ -14,6 +14,13 @@ public class EnemyMover : MonoBehaviour
     private bool goRight;
     private float timer;
 
+    public void Reset()
+    {
+        timer = 0f;
+        goRight = true;
+        goDown = false;
+    }
+
     private void Awake()
     {
         EventDispatcher.OnEnemyReachEdge += OnEnemyReachedEdge;

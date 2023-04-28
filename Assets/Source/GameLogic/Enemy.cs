@@ -8,7 +8,7 @@ namespace Enemies
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(BoxCollider))]
     [RequireComponent(typeof(EnemyMover))]
-    public class Enemy : MonoBehaviour
+    public class Enemy : MonoBehaviour, IPoolable
     {
         [SerializeField] private Transform firePivot;
 
@@ -32,13 +32,14 @@ namespace Enemies
         private float timer;
         private bool dead;
         private BulletPool bulletPool;
+        private ObjectPool<Enemy> enemyPool;
 
         private void Awake()
         {
             sprtRend = GetComponent<SpriteRenderer>();
         }
 
-        public void Setup(EnemyData data, int row, int column, BulletPool bulletPool)
+        public void Setup(EnemyData data, int row, int column, BulletPool bulletPool, ObjectPool<Enemy> enemyPool)
         {
             enemyKind = data.Kind;
             enemyColor = data.Color; //Could ask for color to EnemyRepository using ID each time, 
@@ -49,6 +50,7 @@ namespace Enemies
             rowIndex = row;
             columnIndex = column;
             this.bulletPool = bulletPool;
+            this.enemyPool = enemyPool;
         }
 
         private void Update()
@@ -120,6 +122,8 @@ namespace Enemies
         /// <param name="autoKill"></param>
         public void Kill(bool autoKill = false)
         {
+            if (dead) return;
+
             dead = true; //Mark as killed.
             if (!autoKill) //Gives score only if was killed by player. By design.
             {
@@ -152,12 +156,24 @@ namespace Enemies
             return marked;
         }
 
+        public void Reset() 
+        {
+            timer = 0f;
+            marked = false;
+            dead = false;
+            EnemyMover mover = GetComponent<EnemyMover>();
+            mover.enabled = true;
+            mover.Reset();
+            GetComponent<BoxCollider>().enabled = true;          
+            GetComponent<SpriteRenderer>().enabled = true;
+        }
+
         private IEnumerator DestroyEnemy()
         {
             GetComponent<BoxCollider>().enabled = false;
             yield return new WaitForSeconds(idleFrequency); //So exploding effect will last enough to be properly seen.
-            GetComponent<SpriteRenderer>().enabled = false;            
-            Destroy(gameObject); //Improvable: Could use disable instead of destroy and reuse+reset assets each game.
+            GetComponent<SpriteRenderer>().enabled = false;
+            enemyPool.Release(this);
         }
 
         public bool IsDead()
@@ -168,6 +184,11 @@ namespace Enemies
         public int GetKind()
         {
             return enemyKind;
+        }
+
+        public void ReturnToPool()
+        {
+            Kill(true);
         }
     }
 }
