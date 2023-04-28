@@ -13,11 +13,6 @@ public class Bullet : MonoBehaviour, IPoolable
         EventDispatcher.OnEnemyReset += EnemiesReset;
     }
 
-    private void EnemiesReset()
-    {
-        DestroyBullet(); //Bullets disappear when enemies are reset
-    }
-
     public void SetPool(ObjectPool<Bullet> pool) {
         this.pool = pool;
     }
@@ -30,6 +25,11 @@ public class Bullet : MonoBehaviour, IPoolable
         gameObject.SetActive(active);
     }
 
+    public void ReturnToPool()
+    {
+        DestroyBullet();
+    }
+
     public void DestroyBullet()
     {
         if (activeBullet)
@@ -39,13 +39,14 @@ public class Bullet : MonoBehaviour, IPoolable
         }
     }
 
+    private void EnemiesReset()
+    {
+        DestroyBullet(); //Bullets disappear when enemies are reset
+    }
+
     private void OnDestroy()
     {
         EventDispatcher.OnEnemyReset -= EnemiesReset;
     }
 
-    public void ReturnToPool()
-    {
-        DestroyBullet();
-    }
 }
