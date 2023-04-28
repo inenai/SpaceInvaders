@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Pool;
 
 [RequireComponent(typeof(BoxCollider))]
 [RequireComponent(typeof(SpriteRenderer))]
-public class Bullet : MonoBehaviour
+public class Bullet : MonoBehaviour, IPoolable
 {
+    private ObjectPool<Bullet> pool;
+    private bool activeBullet;
 
     private void Awake()
     {
@@ -13,18 +16,37 @@ public class Bullet : MonoBehaviour
 
     private void EnemiesReset()
     {
-        Destroy(gameObject); //Bullets disappear when enemies are reset
+        DestroyBullet(); //Bullets disappear when enemies are reset
+    }
+
+    public void SetPool(ObjectPool<Bullet> pool) {
+        this.pool = pool;
+    }
+
+    public void SetActive(bool active)
+    {
+        activeBullet = active;
+        GetComponent<BoxCollider>().enabled = active;
+        GetComponent<SpriteRenderer>().enabled = active;
+        gameObject.SetActive(active);
     }
 
     public void DestroyBullet()
     {
-        GetComponent<BoxCollider>().enabled = false;
-        GetComponent<SpriteRenderer>().enabled = false;
-        Destroy(gameObject);        
+        if (activeBullet)
+        {
+            SetActive(false);
+            pool.Release(this);
+        }
     }
 
     private void OnDestroy()
     {
         EventDispatcher.OnEnemyReset -= EnemiesReset;
+    }
+
+    public void ReturnToPool()
+    {
+        DestroyBullet();
     }
 }

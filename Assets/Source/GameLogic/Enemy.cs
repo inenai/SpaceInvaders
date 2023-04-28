@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Enemies
 {
@@ -17,27 +18,27 @@ namespace Enemies
         [Header("References")]
         [SerializeField] private Sprite[] idleSprites;
         [SerializeField] private Sprite dieSprite;
-        [SerializeField] private GameObject bulletPrefab;
         [SerializeField] private ParticleSystem aboutToDieParticles;
 
-        private SpriteRenderer sprtRend;
         public int rowIndex { get; private set; }
         public int columnIndex { get; private set; }
+
+        private SpriteRenderer sprtRend;
         private int enemyKind;
         private int score;
         private Color enemyColor;
-
         private int currentLife;
         private int idleSpriteIndex;
         private float timer;
         private bool dead;
+        private BulletPool bulletPool;
 
         private void Awake()
         {
             sprtRend = GetComponent<SpriteRenderer>();
         }
 
-        public void Setup(EnemyData data, int row, int column)
+        public void Setup(EnemyData data, int row, int column, BulletPool bulletPool)
         {
             enemyKind = data.Kind;
             enemyColor = data.Color; //Could ask for color to EnemyRepository using ID each time, 
@@ -47,6 +48,7 @@ namespace Enemies
             score = data.Score;
             rowIndex = row;
             columnIndex = column;
+            this.bulletPool = bulletPool;
         }
 
         private void Update()
@@ -72,7 +74,8 @@ namespace Enemies
         {
             if (!IsDead())
             {
-                Instantiate(bulletPrefab, firePivot.position, Quaternion.identity);
+                Bullet bullet = bulletPool.GetEnemyBullet();
+                bullet.gameObject.transform.position = firePivot.position;               
                 float xCoord = Camera.main.WorldToViewportPoint(transform.position).x;
                 EventDispatcher.EnemyShot(xCoord);
             }

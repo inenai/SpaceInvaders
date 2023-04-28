@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Pool;
 
 [RequireComponent(typeof(PlayerMover))]
 [RequireComponent(typeof(SpriteRenderer))]
@@ -14,10 +15,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float blinkDuration = 0.05f;
 
     [Header("References")]
-    [SerializeField] private GameObject bullet;
     [SerializeField] private LivesCounter livesCounter;
     [SerializeField] private SceneLoader sceneLoader;
     [SerializeField] private GameObject explosion;
+    [SerializeField] private BulletPool bulletPool;
 
     private bool shot;
     private int currentLife;
@@ -44,7 +45,8 @@ public class Player : MonoBehaviour
             {
                 float xCoord = Camera.main.WorldToViewportPoint(transform.position).x;
                 EventDispatcher.PlayerShot(xCoord);
-                Instantiate(bullet, firePivot.position, Quaternion.identity);
+                Bullet bullet = bulletPool.GetPlayerBullet();
+                bullet.gameObject.transform.position = firePivot.position;
                 shot = true;
             }
         }

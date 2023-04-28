@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Enemies
 {
@@ -18,6 +19,7 @@ namespace Enemies
         [Header("References")]
         [SerializeField] private GameObject[] enemyPrefabs;
         [SerializeField] private EnemyRepository enemyRepo;
+        [SerializeField] private BulletPool bulletPool;
 
         private Enemy[][] enemies;
         private HashSet<Enemy> aliveEnemies;
@@ -81,7 +83,7 @@ namespace Enemies
                     //Enemies areinstantiated to the right by adding offset. 
                     //Could be instantiated in accordance to viewport so it will look centered in any aspect ratio.
                     enemies[i][j] = enemy.GetComponent<Enemy>();
-                    enemies[i][j].Setup(GetRandomEnemyData(), i, j); //Give random enemy type.
+                    enemies[i][j].Setup(GetRandomEnemyData(), i, j, bulletPool); //Give random enemy type.
                     aliveEnemies.Add(enemies[i][j]); //Set with alive enemies. Enemies will be reset when this set is empty.
                 }
             }
