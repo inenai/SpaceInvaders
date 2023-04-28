@@ -2103,7 +2103,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'PUNTAJE:'
+  m_Text: 'SCORE:'
 --- !u!222 &1645426902
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2422,7 +2422,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'VIDAS:'
+  m_Text: 'LIVES:'
 --- !u!222 &1887013130
 CanvasRenderer:
   m_ObjectHideFlags: 0
