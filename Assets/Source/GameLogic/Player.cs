@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Pool;
 
 [RequireComponent(typeof(PlayerMover))]
 [RequireComponent(typeof(SpriteRenderer))]
