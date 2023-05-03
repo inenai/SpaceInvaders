@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.UI;
 
 namespace Enemies
 {
@@ -20,6 +22,7 @@ namespace Enemies
         [SerializeField] private GameObject[] enemyPrefabs;
         [SerializeField] private EnemyRepository enemyRepo;
         [SerializeField] private BulletPool bulletPool;
+        [SerializeField] private Text roundText;
 
         private Enemy[][] enemies;
         private ObjectPool<Enemy> enemyPool;
@@ -31,6 +34,7 @@ namespace Enemies
         private float fireTimer;
         private float resetTimer;
         private bool resetEnemies;
+        private int stage = 1;
 
         public EnemyData GetRandomEnemyData()
         {
@@ -46,7 +50,7 @@ namespace Enemies
         private void Start()
         {
             enemyPool = new ObjectPool<Enemy>(CreateEnemy, OnGetEnemyFromPool, OnReturnEnemyToPool);
-            ResetEnemies();
+            StartCoroutine(ResetEnemies());
         }
 
         private void OnGetEnemyFromPool(Enemy enemy)
@@ -65,9 +69,24 @@ namespace Enemies
             return enemyGO.GetComponent<Enemy>();
         }
 
-        private void ResetEnemies()
+        private void ShowStage() 
+        {
+            string text = "Round " + stage.ToString();
+            roundText.text = text;
+            roundText.gameObject.SetActive(true);
+        }
+
+        private void HideStage() 
+        {
+            roundText.gameObject.SetActive(false);
+            stage++;
+        }
+
+        private IEnumerator ResetEnemies()
         {
             EventDispatcher.EnemyReset();
+            ShowStage();
+           
             if (firingEnemies != null)
             {
                 firingEnemies.Clear();
@@ -92,6 +111,7 @@ namespace Enemies
             initialPosition = new Vector2(vToWorldPoint.x, vToWorldPoint.y);
             currentFireDelay = Random.Range(minFireTime, maxFireTime);
 
+            yield return null;          
             for (int i = 0; i < enemies.Length; i++)
             {
                 for (int j = 0; j < enemies[i].Length; j++)
@@ -105,13 +125,14 @@ namespace Enemies
                     //Could be instantiated in accordance to viewport so it will look centered in any aspect ratio.
                     enemies[i][j] = enemy.GetComponent<Enemy>();
                     enemies[i][j].Setup(GetRandomEnemyData(), i, j, bulletPool, enemyPool); //Give random enemy type.
-                    aliveEnemies.Add(enemies[i][j]); //Set with alive enemies. Enemies will be reset when this set is empty.
+                    aliveEnemies.Add(enemies[i][j]); //Set with alive enemies. Enemies will be reset when this set is empty.                   
                 }
             }
             foreach (Enemy enemy in enemies[enemies.Length - 1])
             {
                 firingEnemies.Add(enemy); //At first, all the lower row of enemies will be firing.
             }
+            HideStage();
         }
 
         private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill, float xCoord)
@@ -223,7 +244,7 @@ namespace Enemies
                 else
                 {
                     resetEnemies = false;
-                    ResetEnemies();
+                    StartCoroutine(ResetEnemies());
                     resetTimer = 0f;
                     return;
                 }

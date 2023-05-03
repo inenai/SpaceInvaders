@@ -43,8 +43,10 @@ namespace Enemies
         {
             enemyKind = data.Kind;
             enemyColor = data.Color; //Could ask for color to EnemyRepository using ID each time, 
-                                     //but in this case storing a color doesn't take up too much memory.
+                                     //but in this case storing a color doesn't take up too much memory
+            idleSpriteIndex = 0;
             sprtRend.color = enemyColor;
+            sprtRend.sprite = idleSprites[idleSpriteIndex];
             currentLife = data.Life;
             score = data.Score;
             rowIndex = row;
