@@ -32,6 +32,7 @@ namespace Enemies
         private Vector2 initialPosition;
         private float currentFireDelay;
         private float fireTimer;
+        private float roundEndTimer;
         private float resetTimer;
         private bool resetEnemies;
         private int stage = 1;
@@ -84,8 +85,8 @@ namespace Enemies
 
         private IEnumerator ResetEnemies()
         {
-            EventDispatcher.EnemyReset();
-            ShowStage();
+            resetTimer = 0f;
+            EventDispatcher.EnemyReset();            
            
             if (firingEnemies != null)
             {
@@ -110,29 +111,47 @@ namespace Enemies
             }
             initialPosition = new Vector2(vToWorldPoint.x, vToWorldPoint.y);
             currentFireDelay = Random.Range(minFireTime, maxFireTime);
+            
+            ShowStage();
+            yield return null;            
 
-            yield return null;          
             for (int i = 0; i < enemies.Length; i++)
             {
                 for (int j = 0; j < enemies[i].Length; j++)
                 {
+                    resetTimer += Time.unscaledDeltaTime;
                     Enemy enemy = enemyPool.Get();
-                    enemy.transform.position = new Vector3(initialPosition.x + (offset.x * j), initialPosition.y - (offset.y * i), 0f);
-                    enemy.transform.SetParent(transform);
-                    enemy.Reset();
-                    //TODO Improvable: 
-                    //Enemies areinstantiated to the right by adding offset. 
-                    //Could be instantiated in accordance to viewport so it will look centered in any aspect ratio.
                     enemies[i][j] = enemy.GetComponent<Enemy>();
-                    enemies[i][j].Setup(GetRandomEnemyData(), i, j, bulletPool, enemyPool); //Give random enemy type.
-                    aliveEnemies.Add(enemies[i][j]); //Set with alive enemies. Enemies will be reset when this set is empty.                   
+                    yield return null;
                 }
             }
+
+            if (resetTimer < 1f)
+            {
+                Debug.Log(string.Format("It took only {0} seconds to reset enemies so far, adding time", resetTimer));
+                yield return new WaitForSecondsRealtime(1f - resetTimer);
+            }
+            HideStage();
+
+            for (int i = 0; i < enemies.Length; i++)
+            {
+                for (int j = 0; j < enemies[i].Length; j++)
+                {
+                    enemies[i][j].transform.position = new Vector3(initialPosition.x + (offset.x * j), initialPosition.y - (offset.y * i), 0f);
+                    enemies[i][j].transform.SetParent(transform);
+                    enemies[i][j].Reset();
+                    //TODO Improvable: 
+                    //Enemies areinstantiated to the right by adding offset. 
+                    //Could be instantiated in accordance to viewport so it will look centered in any aspect ratio.                   
+                    enemies[i][j].Setup(GetRandomEnemyData(), i, j, bulletPool, enemyPool); //Give random enemy type.
+                    aliveEnemies.Add(enemies[i][j]); //Set with alive enemies. Enemies will be reset when this set is empty.      
+                }
+            }
+
             foreach (Enemy enemy in enemies[enemies.Length - 1])
             {
                 firingEnemies.Add(enemy); //At first, all the lower row of enemies will be firing.
-            }
-            HideStage();
+            }           
         }
 
         private void EnemyKilled(int rowIndex, int columnIndex, bool autoKill, float xCoord)
@@ -142,6 +161,7 @@ namespace Enemies
             if (aliveEnemies.Count == 0)
             {
                 resetEnemies = true; //No more enemies are alive or not marked as killed.
+                EventDispatcher.ScoreGained(1000); //Round beaten score!
                 return;
             }
 
@@ -237,15 +257,15 @@ namespace Enemies
         {
             if (resetEnemies)
             {
-                if (resetTimer < resetDelay)
+                if (roundEndTimer < resetDelay)
                 {  //waiting so last explosion will be shown.
-                    resetTimer += Time.deltaTime;
+                    roundEndTimer += Time.deltaTime;
                 }
                 else
                 {
                     resetEnemies = false;
                     StartCoroutine(ResetEnemies());
-                    resetTimer = 0f;
+                    roundEndTimer = 0f;
                     return;
                 }
             }
