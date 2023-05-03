@@ -35,7 +35,7 @@ namespace Enemies
         private float roundEndTimer;
         private float resetTimer;
         private bool resetEnemies;
-        private int stage = 1;
+        private int round = 1;
 
         public EnemyData GetRandomEnemyData()
         {
@@ -51,7 +51,7 @@ namespace Enemies
         private void Start()
         {
             enemyPool = new ObjectPool<Enemy>(CreateEnemy, OnGetEnemyFromPool, OnReturnEnemyToPool);
-            StartCoroutine(ResetEnemies());
+            StartCoroutine(SetEnemies());
         }
 
         private void OnGetEnemyFromPool(Enemy enemy)
@@ -72,7 +72,7 @@ namespace Enemies
 
         private void ShowStage() 
         {
-            string text = "Round " + stage.ToString();
+            string text = "Round " + round.ToString();
             roundText.text = text;
             roundText.gameObject.SetActive(true);
         }
@@ -80,13 +80,18 @@ namespace Enemies
         private void HideStage() 
         {
             roundText.gameObject.SetActive(false);
-            stage++;
+            round++;
         }
 
         private IEnumerator ResetEnemies()
         {
-            resetTimer = 0f;
-            EventDispatcher.EnemyReset();            
+            EventDispatcher.EnemyReset();
+            return SetEnemies();
+        }
+
+        private IEnumerator SetEnemies()
+        {
+            resetTimer = 0f;           
            
             if (firingEnemies != null)
             {

@@ -10,7 +10,8 @@ public class Player : MonoBehaviour
     [SerializeField] private SpriteRenderer sprtRend;
 
     [Header("Configuration")]
-    [SerializeField] private int initialLife = 3;
+    [SerializeField] private int initialLife = INITIAL_LIFE;
+    [SerializeField] private int lifeCap = LIFE_CAP;
     [SerializeField] private float blinkDuration = 0.05f;
 
     [Header("References")]
@@ -18,6 +19,9 @@ public class Player : MonoBehaviour
     [SerializeField] private SceneLoader sceneLoader;
     [SerializeField] private GameObject explosion;
     [SerializeField] private BulletPool bulletPool;
+
+    private const int INITIAL_LIFE = 3;
+    private const int LIFE_CAP = 5;
 
     private bool shot;
     private int currentLife;
@@ -28,12 +32,13 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         EventDispatcher.OnPauseMenuOpen += ToggleFire;
+        EventDispatcher.OnEnemyReset += GainLife;
     }
 
     private void Start()
     {
         currentLife = initialLife;
-        livesCounter.Setup(initialLife);
+        livesCounter.Setup(currentLife);
     }
 
     private void Update()
@@ -52,6 +57,15 @@ public class Player : MonoBehaviour
         else if (!Input.GetButton("Fire")) //Disable continuous bullet instantiation.
         {
             shot = false;
+        }
+    }
+
+    private void GainLife()
+    {
+        if (currentLife < lifeCap)
+        {
+            currentLife++;
+            livesCounter.Setup(currentLife);
         }
     }
 
@@ -118,5 +132,6 @@ public class Player : MonoBehaviour
     private void OnDestroy()
     {
         EventDispatcher.OnPauseMenuOpen -= ToggleFire;
+        EventDispatcher.OnEnemyReset -= GainLife;
     }
 }
