@@ -13,6 +13,7 @@ public class EnemyMover : MonoBehaviour
     private bool goDown;
     private bool goRight;
     private float timer;
+    private float currentFrequency;
 
     public void Reset()
     {
@@ -21,8 +22,21 @@ public class EnemyMover : MonoBehaviour
         goDown = false;
     }
 
+    public void SetSpeedFactor(int stage)
+    {
+        if (stage <= 9)
+        {
+            currentFrequency = frequency - ((float)stage * 0.04f);
+        }
+        else 
+        {
+            currentFrequency = frequency - 0.4f;
+        }
+    }
+
     private void Awake()
     {
+        currentFrequency = frequency;
         EventDispatcher.OnEnemyReachEdge += OnEnemyReachedEdge;
         sprtRend = GetComponent<SpriteRenderer>();
         goRight = true;
@@ -50,7 +64,7 @@ public class EnemyMover : MonoBehaviour
     private void LateUpdate() //Separating actual movement in LateUpdate so every enemy will know where to move next.
     {
         timer += Time.deltaTime;
-        if (timer > frequency)
+        if (timer > currentFrequency)
         {
             if (goDown)
             {
@@ -61,7 +75,7 @@ public class EnemyMover : MonoBehaviour
             {
                 transform.position += new Vector3(goRight ? horizontalDistance : -horizontalDistance, 0f, 0f);
             }
-            timer -= frequency;
+            timer -= currentFrequency;
         }
     }
 

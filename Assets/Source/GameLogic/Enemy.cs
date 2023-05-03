@@ -33,13 +33,15 @@ namespace Enemies
         private bool dead;
         private BulletPool bulletPool;
         private ObjectPool<Enemy> enemyPool;
+        EnemyMover mover;
 
         private void Awake()
         {
+            mover = GetComponent<EnemyMover>();
             sprtRend = GetComponent<SpriteRenderer>();
         }
 
-        public void Setup(EnemyData data, int row, int column, BulletPool bulletPool, ObjectPool<Enemy> enemyPool)
+        public void Setup(EnemyData data, int row, int column, BulletPool bulletPool, ObjectPool<Enemy> enemyPool, int round)
         {
             enemyKind = data.Kind;
             enemyColor = data.Color; //Could ask for color to EnemyRepository using ID each time, 
@@ -51,6 +53,7 @@ namespace Enemies
             score = data.Score;
             rowIndex = row;
             columnIndex = column;
+            mover.SetSpeedFactor(round);
             this.bulletPool = bulletPool;
             this.enemyPool = enemyPool;
         }
@@ -133,7 +136,7 @@ namespace Enemies
                 EventDispatcher.ScoreGained(score);
             }
             currentLife = 0;
-            GetComponent<EnemyMover>().enabled = false;
+            mover.enabled = false;
             if (hitCoroutine != null)
             {
                 StopCoroutine(hitCoroutine); //Reset hit sprite color change coroutine.

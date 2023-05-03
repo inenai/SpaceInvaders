@@ -128,7 +128,7 @@ namespace Enemies
 
             if (resetTimer < 1f)
             {
-                Debug.Log(string.Format("It took only {0} seconds to reset enemies so far, adding time", resetTimer));
+                //Debug.Log(string.Format("It took only {0} seconds to reset enemies so far, adding time", resetTimer));
                 yield return new WaitForSecondsRealtime(1f - resetTimer);
             }
             HideStage();
@@ -143,7 +143,7 @@ namespace Enemies
                     //TODO Improvable: 
                     //Enemies areinstantiated to the right by adding offset. 
                     //Could be instantiated in accordance to viewport so it will look centered in any aspect ratio.                   
-                    enemies[i][j].Setup(GetRandomEnemyData(), i, j, bulletPool, enemyPool); //Give random enemy type.
+                    enemies[i][j].Setup(GetRandomEnemyData(), i, j, bulletPool, enemyPool, round); //Give random enemy type.
                     aliveEnemies.Add(enemies[i][j]); //Set with alive enemies. Enemies will be reset when this set is empty.      
                 }
             }
