@@ -95,6 +95,7 @@ namespace Enemies
                 else
                 {
                     if (currentLife == 1) {
+                        aboutToDieParticles.gameObject.SetActive(true);
                         aboutToDieParticles.Play();
                     }
                     if (hitCoroutine != null)
