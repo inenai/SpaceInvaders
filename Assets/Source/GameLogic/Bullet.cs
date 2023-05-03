@@ -10,7 +10,7 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private void Awake()
     {
-        EventDispatcher.OnEnemyReset += EnemiesReset;
+        //EventDispatcher.OnEnemyReset += EnemiesReset; //Disabled by new design
     }
 
     public void SetPool(ObjectPool<Bullet> pool) {
@@ -41,12 +41,12 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private void EnemiesReset()
     {
-        DestroyBullet(); //Bullets disappear when enemies are reset
+        //DestroyBullet(); //Make bullets disappear when enemies are reset //Disabled by new design
     }
 
     private void OnDestroy()
     {
-        EventDispatcher.OnEnemyReset -= EnemiesReset;
+        //EventDispatcher.OnEnemyReset -= EnemiesReset; //Disabled by new design
     }
 
 }
